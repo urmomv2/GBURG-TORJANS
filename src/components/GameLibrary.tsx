@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X, Play } from 'lucide-react';
 import ObfuscatedText from './ObfuscatedText';
+import { useEndpoints } from '../hooks/useEndpoints';
 
 interface GameData {
   label: string;
@@ -15,6 +16,7 @@ const GameLibrary: React.FC = () => {
   const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const { endpoints } = useEndpoints();
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -26,12 +28,10 @@ const GameLibrary: React.FC = () => {
             'X-Trojans-Request': 'true',
           },
         });
-
         if (!res.ok) {
           if (res.status === 403) throw new Error('Access Denied');
           throw new Error(`Server error: ${res.status}`);
         }
-
         const data = await res.json();
         setGames(data.games || []);
       } catch (err: any) {
@@ -40,13 +40,29 @@ const GameLibrary: React.FC = () => {
         setLoading(false);
       }
     };
-
     fetchGames();
   }, []);
 
   const filteredGames = games.filter((game) =>
     game.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const launchGame = (game: GameData) => {
+    if (!endpoints) return;
+    let url = game.url;
+    // Rewrite static paths that may have leaked into games.json
+    url = url
+      .replace('/scram-embed.html', `/${endpoints.scramEmbed}.html`)
+      .replace('/embed.html', `/${endpoints.embedHtml}.html`)
+      .replace('/youtube-embed.html', `/${endpoints.youtubeEmbed}.html`)
+      .replace('/google-embed.html', `/${endpoints.googleEmbed}.html`)
+      .replace('/libcurl-embed.html', `/${endpoints.libcurlEmbed}.html`);
+    // "!!/" shortcut → embed
+    if (url.includes('!!/')) {
+      url = url.replace('!!/', `/${endpoints.embedHtml}.html#`);
+    }
+    setSelectedGame({ ...game, url });
+  };
 
   return (
     <div className="flex flex-col h-full w-full relative">
@@ -87,7 +103,7 @@ const GameLibrary: React.FC = () => {
             <div
               key={index}
               className="relative bg-black rounded-[10px] w-[150px] h-[150px] flex justify-center items-center cursor-pointer overflow-hidden transition-transform duration-200 hover:scale-105 group"
-              onClick={() => setSelectedGame(game)}
+              onClick={() => launchGame(game)}
             >
               <img
                 src={game.imageUrl}
@@ -98,14 +114,12 @@ const GameLibrary: React.FC = () => {
                   (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=No+Image';
                 }}
               />
-
               <ObfuscatedText
                 as="div"
                 className="absolute text-white font-['Nunito',_serif] text-[18px] text-center opacity-0 transition-opacity duration-300 pointer-events-none z-10 w-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover:opacity-100"
               >
                 {game.label}
               </ObfuscatedText>
-
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
                 <div className="w-12 h-12 rounded-full bg-blue-600/80 backdrop-blur-sm flex items-center justify-center transform scale-50 group-hover:scale-100 transition-transform duration-300">
                   <Play size={20} className="text-white ml-1" fill="white" />

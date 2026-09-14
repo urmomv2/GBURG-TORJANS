@@ -6,13 +6,9 @@
   <title>Loading…</title>
   <style>
     html, body, iframe {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-      background: #000;
-      overflow: hidden;
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
+      border: 0; background: #000; overflow: hidden;
     }
   </style>
 </head>
@@ -26,11 +22,11 @@
       const params = new URLSearchParams(location.search);
       let target = params.get('url') || '';
 
-      // Resolve PeteZah "!!/" shortcut to the embed transport
+      // Resolve Trojan "!!/" shortcut
       if (target.startsWith('/!!/')) {
         target = '/embed.html#' + target.slice(4);
       }
-      // Bare URLs (no protocol, not absolute) become local paths
+      // Bare relative path
       else if (!/^(https?:)?\/\//.test(target) && !target.startsWith('/')) {
         target = '/' + target;
       }

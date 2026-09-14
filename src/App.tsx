@@ -26,7 +26,6 @@ const App: React.FC = () => {
       {currentView === 'home' && <RainEffect />}
 
       <div className="relative z-20 flex h-full">
-        {/* Sidebar */}
         <aside className="w-16 flex flex-col items-center py-4 gap-6 border-r border-white/10 bg-black/40 backdrop-blur-md z-30">
           <button
             onClick={() => setCurrentView('home')}
@@ -36,16 +35,10 @@ const App: React.FC = () => {
           </button>
 
           <div className="flex flex-col gap-6 mt-4">
-            <button
-              onClick={() => setCurrentView('home')}
-              className={`transition ${currentView === 'home' ? 'text-blue-400' : 'text-gray-400 hover:text-white'}`}
-            >
+            <button onClick={() => setCurrentView('home')} className={`transition ${currentView === 'home' ? 'text-blue-400' : 'text-gray-400 hover:text-white'}`}>
               <Home size={22} />
             </button>
-            <button
-              onClick={() => setCurrentView('games')}
-              className={`transition ${currentView === 'games' ? 'text-blue-400' : 'text-gray-400 hover:text-white'}`}
-            >
+            <button onClick={() => setCurrentView('games')} className={`transition ${currentView === 'games' ? 'text-blue-400' : 'text-gray-400 hover:text-white'}`}>
               <Gamepad2 size={22} />
             </button>
             <button className="text-gray-400 hover:text-white transition"><Wallet size={22} /></button>
@@ -61,7 +54,6 @@ const App: React.FC = () => {
           </div>
         </aside>
 
-        {/* Main */}
         <main className="flex-1 flex flex-col">
           <header className="h-14 flex items-center px-4 gap-4 border-b border-white/10 bg-black/20 backdrop-blur-md z-30">
             <div className="flex gap-2 text-gray-400">
@@ -93,10 +85,7 @@ const App: React.FC = () => {
                 >
                   <MoreVertical size={18} />
                 </button>
-                <SettingsDropdown
-                  isOpen={isSettingsOpen}
-                  onClose={() => setIsSettingsOpen(false)}
-                />
+                <SettingsDropdown isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
               </div>
             </div>
           </header>
@@ -112,25 +101,6 @@ const App: React.FC = () => {
                     <LinkIcon size={16} /> Get Links
                   </button>
                 </div>
-
-                <div className="absolute top-20 left-8 flex gap-3">
-                  <button className="w-10 h-10 rounded-full bg-black/40 border border-white/10 flex items-center justify-center hover:bg-white/10 transition">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/1024px-Instagram_icon.png" alt="IG" className="w-5 h-5" />
-                  </button>
-                  <button className="w-10 h-10 rounded-full bg-black/40 border border-white/10 flex items-center justify-center hover:bg-white/10 transition">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Spotify_icon.svg/1024px-Spotify_icon.svg.png" alt="Spotify" className="w-5 h-5" />
-                  </button>
-                  <button className="w-10 h-10 rounded-full bg-black/40 border border-white/10 flex items-center justify-center hover:bg-white/10 transition">
-                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/TikTok_logo.svg/1200px-TikTok_logo.svg.png" alt="TikTok" className="w-5 h-5" />
-                  </button>
-                  <button className="w-10 h-10 rounded-full bg-black/40 border border-white/10 flex items-center justify-center hover:bg-white/10 transition">
-                    <Plus size={20} />
-                  </button>
-                </div>
-
-                <button className="absolute top-20 left-64 flex items-center gap-2 bg-black/40 border border-white/10 px-4 py-2 rounded-full text-sm hover:bg-white/10 transition">
-                  <span>🔥</span> Trending
-                </button>
 
                 <div className="flex flex-col items-center w-full max-w-2xl mt-12">
                   <h1 className="text-6xl font-bold mb-8 tracking-wider">Trojans</h1>
