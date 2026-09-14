@@ -1,0 +1,14 @@
+node_modules
+dist
+.env
+.env.local
+*.log
+.DS_Store
+
+# Generated at build time — never commit
+server/data/endpoints.json
+server/data/user_settings.json
+
+# PeteZah bundles — pull fresh from their repo
+server/modules/uv/*.wasm
+server/modules/uv/*.map
