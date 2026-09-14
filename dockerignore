@@ -1,0 +1,8 @@
+node_modules
+dist
+server/node_modules
+.git
+.gitignore
+README.md
+server/data/user_settings.json
+server/data/endpoints.json
