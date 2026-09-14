@@ -1,3 +1,4 @@
+// src/hooks/useSettings.ts
 import { useState, useEffect } from 'react';
 
 export interface UserSettings {
@@ -10,6 +11,8 @@ export interface UserSettings {
   showVM: boolean;
   showChat: boolean;
   showTools: boolean;
+  proxyEngine: string;
+  browser: string;
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -22,6 +25,8 @@ const DEFAULT_SETTINGS: UserSettings = {
   showVM: true,
   showChat: true,
   showTools: true,
+  proxyEngine: 'scramjet',
+  browser: 'chrome',
 };
 
 export const useSettings = () => {
@@ -30,7 +35,6 @@ export const useSettings = () => {
 
   useEffect(() => {
     const loadSettings = async () => {
-      // 1. Try local cache first (Instant load)
       const cached = localStorage.getItem('trojans_settings');
       if (cached) {
         try {
@@ -40,7 +44,6 @@ export const useSettings = () => {
         }
       }
 
-      // 2. Fetch from API to get the latest user data
       try {
         const res = await fetch('/api/user/settings');
         if (res.ok) {
@@ -61,11 +64,8 @@ export const useSettings = () => {
   const updateSettings = async (newSettings: Partial<UserSettings>) => {
     const updated = { ...settings, ...newSettings };
     setSettings(updated);
-    
-    // Save to cache immediately
     localStorage.setItem('trojans_settings', JSON.stringify(updated));
 
-    // Sync to API in the background
     try {
       await fetch('/api/user/settings', {
         method: 'POST',
