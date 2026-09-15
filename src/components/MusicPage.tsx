@@ -14,7 +14,7 @@ import {
   Search, Play, Pause, SkipBack, SkipForward, Repeat, Repeat1, ListMusic,
   Plus, Trash2, Share2, X, Music2, Heart, Copy, Check, Disc3, Flame,
   Sparkles, Zap, Radio, ChevronLeft, ChevronRight, MoreHorizontal,
-  ListPlus, ListEnd, Library, SlidersHorizontal,
+  ListPlus, Library, SlidersHorizontal,
 } from "lucide-react";
 import { CoverImg } from "../lib/mediaCover";
 
@@ -87,7 +87,6 @@ const EQ_ORANGE_DIM = "hsla(28, 70%, 48%, 0.22)";
 const MUSIC_KEY = "trojans-music";
 const LIKED_KEY = "trojans-music-liked";
 const MUSIC_URL_PREFIX = "trojans://music";
-const ease = [0.22, 1, 0.36, 1] as const;
 
 function loadEqState(): { on: boolean; gains: number[]; preset: string } {
   try {
@@ -267,11 +266,6 @@ function loadYoutubeApi() {
   });
 }
 
-function loadSoundCloudApi() {
-  return loadScriptOnce("soundcloud-widget-api", "https://w.soundcloud.com/player/api.js")
-    .then(() => (window as any).SC);
-}
-
 function sectionIcon(name: string) {
   switch (name) {
     case "flame": return <Flame size={14} />;
@@ -396,9 +390,6 @@ export default function MusicPage({ initialUrl }: { initialUrl?: string }) {
       try {
         if (providerRef.current === "youtube" && ytPlayerRef.current) {
           ytPlayerRef.current.seekTo(0); ytPlayerRef.current.playVideo(); setPlaying(true); return;
-        }
-        if (providerRef.current === "soundcloud" && scWidgetRef.current) {
-          scWidgetRef.current.seekTo(0); scWidgetRef.current.play(); setPlaying(true); return;
         }
         if (providerRef.current === "audio" && audioRef.current) {
           audioRef.current.currentTime = 0; audioRef.current.play().catch(() => {}); setPlaying(true); return;
@@ -1025,29 +1016,156 @@ function EqualiserPopover({ on, gains, preset, onToggle, onGain, onPreset, onClo
   onClose: () => void;
 }) {
   return (
-    <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} style={{ position: "absolute", top: "calc(100% + 10px)", right: 0, zIndex: 40, width: 280, padding: "14px", borderRadius: 18, background: "hsla(222, 28%, 10%, 0.96)", border: `1px solid ${S.border}` }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-        <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: S.text }}>Equaliser</p>
-        <button onClick={() => onToggle(!on)} style={{ width: 38, height: 22, borderRadius: 999, border: "none", cursor: "pointer", background: on ? EQ_ORANGE : "hsla(210, 20%, 30%, 0.7)", position: "relative" }}>
-          <span style={{ position: "absolute", top: 2, left: on ? 18 : 2, width: 18, height: 18, borderRadius: "50%", background: on ? "#1a120c" : "#c8c8c8", transition: "left 0.15s" }} />
+    <motion.div
+      initial={{ opacity: 0, y: -6, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -4, scale: 0.98 }}
+      transition={{ duration: 0.18 }}
+      style={{
+        position: "absolute",
+        top: "calc(100% + 10px)",
+        right: 0,
+        zIndex: 40,
+        width: 280,
+        padding: "14px 14px 12px",
+        borderRadius: 18,
+        background: "hsla(222, 28%, 10%, 0.96)",
+        border: `1px solid ${S.border}`,
+        boxShadow: "0 18px 48px rgba(0,0,0,0.45)",
+        backdropFilter: "blur(16px)",
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 12,
+        }}
+      >
+        <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: S.text }}>
+          Equaliser
+        </p>
+        <button
+          type="button"
+          onClick={() => onToggle(!on)}
+          aria-label="Toggle equaliser"
+          style={{
+            width: 38,
+            height: 22,
+            borderRadius: 999,
+            border: "none",
+            cursor: "pointer",
+            background: on ? EQ_ORANGE : "hsla(210, 20%, 30%, 0.7)",
+            position: "relative",
+            padding: 0,
+          }}
+        >
+          <span
+            style={{
+              position: "absolute",
+              top: 2,
+              left: on ? 18 : 2,
+              width: 18,
+              height: 18,
+              borderRadius: "50%",
+              background: on ? "#1a120c" : "hsla(210, 20%, 78%, 0.95)",
+              transition: "left 0.15s ease",
+            }}
+          />
         </button>
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 12, opacity: on ? 1 : 0.45, pointerEvents: on ? "auto" : "none" }}>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 8,
+          marginBottom: 12,
+          opacity: on ? 1 : 0.45,
+          pointerEvents: on ? "auto" : "none",
+        }}
+      >
         {EQ_BANDS.map((band, idx) => (
-          <div key={band.label} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 10, color: EQ_ORANGE }}>{gains[idx] > 0 ? `+${gains[idx]}` : gains[idx]}</span>
-            <input type="range" min={-12} max={12} step={1} value={gains[idx]} onChange={(e) => onGain(idx, Number(e.target.value))} style={{ width: 100, height: 18, transform: "rotate(-90deg)", accentColor: EQ_ORANGE }} />
+          <div
+            key={band.label}
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 10,
+                color: EQ_ORANGE,
+                fontVariantNumeric: "tabular-nums",
+                minHeight: 14,
+              }}
+            >
+              {gains[idx] > 0 ? `+${gains[idx]}` : `${gains[idx]}`}
+            </span>
+            <div
+              style={{
+                height: 100,
+                width: 22,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <input
+                type="range"
+                min={-12}
+                max={12}
+                step={1}
+                value={gains[idx]}
+                onChange={(e) => onGain(idx, Number(e.target.value))}
+                style={{
+                  width: 100,
+                  height: 18,
+                  transform: "rotate(-90deg)",
+                  accentColor: EQ_ORANGE,
+                  cursor: "pointer",
+                }}
+              />
+            </div>
             <span style={{ fontSize: 10, color: S.textMuted }}>{band.label}</span>
           </div>
         ))}
       </div>
+
       <div style={{ display: "flex", gap: 6 }}>
-        {["Flat", "Bass", "Vocal", "Treble"].map((name) => (
-          <button key={name} onClick={() => onPreset(name)} style={{ flex: 1, padding: "7px 0", borderRadius: 999, border: preset === name ? "none" : `1px solid ${S.border}`, background: preset === name ? EQ_ORANGE : "transparent", color: preset === name ? "#140e0a" : S.text, fontSize: 11, fontWeight: 650, cursor: "pointer" }}>
-            {name}
-          </button>
-        ))}
+        {["Flat", "Bass", "Vocal", "Treble"].map((name) => {
+          const active =
+            preset === name ||
+            (name === "Flat" && preset === "Custom" && gains.every((g) => g === 0));
+          return (
+            <button
+              key={name}
+              type="button"
+              onClick={() => onPreset(name)}
+              style={{
+                flex: 1,
+                padding: "7px 0",
+                borderRadius: 999,
+                border: active ? "none" : `1px solid ${S.border}`,
+                background: active ? EQ_ORANGE : "transparent",
+                color: active ? "#140e0a" : S.text,
+                fontSize: 11,
+                fontWeight: 650,
+                cursor: "pointer",
+              }}
+            >
+              {name}
+            </button>
+          );
+        })}
       </div>
-    </button>
+      <button type="button" onClick={onClose} style={{ display: "none" }} />
+    </motion.div>
   );
 }
