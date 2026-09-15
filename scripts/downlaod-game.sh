@@ -31,7 +31,6 @@ fi
 echo "📦 Extracting archive..."
 unzip -q "$ZIP" -d "$TMP"
 
-# Locate the extracted folder (usually <repo>-main)
 EXTRACTED="$(find "$TMP" -maxdepth 1 -mindepth 1 -type d -name '*-main' | head -n 1)"
 
 if [ -z "$EXTRACTED" ]; then
@@ -41,16 +40,12 @@ if [ -z "$EXTRACTED" ]; then
 fi
 
 echo "📂 Copying into $DEST (existing files preserved)..."
-
-# -n = no-clobber, so any game you already added locally stays intact
 cp -rn "$EXTRACTED"/* "$DEST/" 2>/dev/null || true
 
-# Ensure the well-known subfolders exist (games.json references these)
 mkdir -p "$DEST/originals"
 mkdir -p "$DEST/arsenic"
 mkdir -p "$DEST/echo"
 
-# Clean up
 rm -rf "$TMP"
 
 echo ""
