@@ -1,13 +1,12 @@
-// This file overwrites the stock UV config.js
+// public/static/uv/uv.config.js
+// UV copy #1 — served at /static/uv/
 
 self.__uv$config = {
-  prefix: "/petezah/petezah/",
-  bare: "/bare/",
+  prefix: '/static/uv/',
+  bare: '/api/edge/',
   encodeUrl: Ultraviolet.codec.xor.encode,
   decodeUrl: Ultraviolet.codec.xor.decode,
-  handler: "/petezah/handler.js",
-  client: "/petezah/client.js",
-  bundle: "/petezah/bundle.js",
-  config: "/petezah/config.js",
-  sw: "/petezah/rizz.sw.js",
-};
+  handler: '/static/uv/uv.handler.js',
+  bundle:  '/static/uv/uv.bundle.js',
+  config:  '/static/uv/uv.config.js',
+  sw:      '/static/uv/uv.sw.js',

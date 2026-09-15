@@ -1,8 +1,35 @@
+# ---- Dependencies ----
 node_modules
-dist
 server/node_modules
+
+# ---- Build output ----
+dist
+
+# ---- Git ----
 .git
 .gitignore
+
+# ---- Docs ----
 README.md
+*.md
+
+# ---- Local env / state ----
+server/.env
 server/data/user_settings.json
+server/data/vm_usage.json
+
+# ---- Endpoint map regenerated at build ----
 server/data/endpoints.json
+
+# ---- Vendored VM (downloaded during build) ----
+public/firefox-wasm
+.tmp-firefox-wasm
+
+# ---- Downloaded game library (fetched during build) ----
+server/data/storage/ag/*
+
+# ---- Editor / OS ----
+.vscode
+.idea
+.DS_Store
+Thumbs.db

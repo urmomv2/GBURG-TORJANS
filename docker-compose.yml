@@ -2,12 +2,39 @@ version: '3.8'
 
 services:
   trojans:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: trojans-proxy-hub
     ports:
       - "8080:8080"
+    env_file:
+      - ./server/.env
     environment:
-      - NODE_ENV=production
-      - PORT=8080
-    restart: unless-stopped
+      # ---- Runtime ----
+      NODE_ENV: production
+      PORT: 8080
+
+      # ---- Unified monitor tuning (optional) ----
+      MONITOR_TICK_INTERVAL_MS: "1000"
+      MONITOR_RESOURCE_EVERY_N: "30"
+      MONITOR_MAX_MEMORY_MB: "480"
+      MONITOR_MAX_DISK_PERCENT: "85"
+      MONITOR_MIN_FREE_DISK_MB: "100"
+      MONITOR_CONSECUTIVE_BREACH: "2"
+
+      # ---- AI (Groq) ----
+      # Set GROQ_API_KEY in server/.env — not here
+      GROQ_MODEL: openai/gpt-oss-120b
+      GROQ_REASONING_EFFORT: medium
+      AI_RATE_LIMIT: "20"
     volumes:
+      # Persist downloaded games + user settings across restarts
       - ./server/data:/app/server/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
