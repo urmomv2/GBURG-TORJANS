@@ -7,8 +7,13 @@
 // Force new aliases: rm server/data/endpoints.json
 // Or: FORCE_REGEN=1 npm run gen-endpoints
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// ESM doesn't have __dirname — build it manually
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const dataDir = path.join(__dirname, '..', 'server', 'data');
 const endpointsPath = path.join(dataDir, 'endpoints.json');
@@ -29,12 +34,37 @@ const gen = (prefix = 'a') => {
 };
 
 const E = {
-  scramjet: gen('q'), clipmux: gen('m'), wisp1: gen('e'), wisp2: gen('l'),
-  rivet: gen('r'), sw: gen('s'),
-  uv: gen('u'), staticUv: gen('v'), trojans: gen('t'),
-  uvBundle: gen('b'), uvClient: gen('c'), uvConfig: gen('f'), uvHandler: gen('h'), uvSw: gen('w'),
-  trojBundle: gen('b'), trojConfig: gen('f'), trojHandler: gen('h'), trojSw: gen('w'), trojRizzSw: gen('r'),
-  uvJs: gen('j'), uvSwJs: gen('k'), registerSw: gen('g'),
+  // ---- Scramjet folders ----
+  scramjet: gen('q'),   // /q9vx/
+  clipmux:  gen('m'),   // /m4thx/
+  wisp1:    gen('e'),   // /e7px/
+  wisp2:    gen('l'),   // /l9cx/
+  rivet:    gen('r'),   // /b/rivet/
+  sw:       gen('s'),   // 1k123.js
+
+  // ---- UV copies (folders) ----
+  uv:       gen('u'),   // /uv/         → server/uv/
+  staticUv: gen('v'),   // /static/uv/  → public/static/uv/
+  trojans:  gen('t'),   // /trojans/    → public/trojans/
+
+  // ---- UV core files (shared names) ----
+  uvBundle:  gen('b'),  // uv.bundle.js
+  uvClient:  gen('c'),  // uv.client.js
+  uvConfig:  gen('f'),  // uv.config.js
+  uvHandler: gen('h'),  // uv.handler.js
+  uvSw:      gen('w'),  // uv.sw.js
+
+  // ---- Trojans UV file aliases ----
+  trojBundle:  gen('b'), // bundle.js
+  trojConfig:  gen('f'), // config.js
+  trojHandler: gen('h'), // handler.js
+  trojSw:      gen('w'), // sw.js
+  trojRizzSw:  gen('r'), // rizz.sw.js
+
+  // ---- Public bootstraps ----
+  uvJs:       gen('j'),  // uv.js
+  uvSwJs:     gen('k'),  // uv-sw.js
+  registerSw: gen('g'),  // register-sw.js
 };
 
 console.log('🔐 Generated endpoints (Mode B — will freeze):');
